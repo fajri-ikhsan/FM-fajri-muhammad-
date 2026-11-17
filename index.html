@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FM (Fajri Muhammad) — Sistem Informasi Penjualan Sound System</title>
+  <link rel="icon" type="image/jpeg" href="assets/images/logo-fm.jpg">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <main class="auth-page">
+    <!-- PANEL KIRI: SHOWCASE FENDER & MARSHALL HERITAGE -->
+    <section class="auth-showcase">
+      <div class="brand-lockup">
+        <img src="assets/images/logo-fm.jpg" alt="Logo FM Fajri Muhammad" class="brand-logo-img">
+        <div class="brand-title-group">
+          <h1>FM SOUND SYSTEM</h1>
+          <span>FAJRI MUHAMMAD • PRO AUDIO</span>
+        </div>
+      </div>
+
+      <div class="showcase-hero">
+        <div class="heritage-pill">
+          <i class="ri-equalizer-2-fill"></i> CUSTOM SHOP &amp; STAGE AMPLIFICATION
+        </div>
+        <h2>Presisi Akustik Panggung dalam <span>Satu Kendali Terpadu.</span></h2>
+        <p>
+          Sistem Informasi Penjualan &amp; Manajemen Inventaris Sound System profesional yang terinspirasi dari standar rekayasa <strong>Fender</strong> dan <strong>Marshall</strong>. Pantau ketersediaan unit, harga resmi, jumlah stok, serta status pembayaran secara real-time.
+        </p>
+
+        <div class="showcase-gear-grid">
+          <div class="gear-mini-card">
+            <img src="assets/images/fender-brown-combo.jpg" alt="Fender Brownface Combo">
+            <div class="gear-brand">FENDER</div>
+            <div class="gear-name">65 Twin Brownface</div>
+          </div>
+          <div class="gear-mini-card">
+            <img src="assets/images/marshall-jcm800-head.jpg" alt="Marshall JCM800 Head">
+            <div class="gear-brand">MARSHALL</div>
+            <div class="gear-name">JCM800 2203 Lead</div>
+          </div>
+          <div class="gear-mini-card">
+            <img src="assets/images/marshall-pa-console.jpg" alt="Marshall Portable PA Console">
+            <div class="gear-brand">PRO CONSOLE</div>
+            <div class="gear-name">Touring PA Mixer</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="showcase-footer">
+        <span><i class="ri-shield-check-line" style="color:var(--gold-light);"></i> Multi-Role Security &amp; Supabase Cloud</span>
+        <span>&copy; 2026 FM (Fajri Muhammad) Audio</span>
+      </div>
+    </section>
+
+    <!-- PANEL KANAN: FORM AUTENTIKASI (LOGIN, REGISTER, LUPA PASSWORD OTP) -->
+    <section class="auth-panel">
+      <div class="auth-card">
+        <div class="auth-tabs">
+          <button type="button" class="auth-tab-btn active" id="tabBtnLogin" onclick="switchAuthTab('login')">
+            <i class="ri-login-box-line"></i> Masuk
+          </button>
+          <button type="button" class="auth-tab-btn" id="tabBtnRegister" onclick="switchAuthTab('register')">
+            <i class="ri-user-add-line"></i> Daftar
+          </button>
+          <button type="button" class="auth-tab-btn" id="tabBtnOtp" onclick="switchAuthTab('otp')">
+            <i class="ri-mail-lock-line"></i> Lupa OTP
+          </button>
+        </div>
+
+        <!-- 1. FORM LOGIN (EMAIL / USERNAME + PASSWORD + SHOW/HIDE) -->
+        <div class="auth-form-section active" id="sectionLogin">
+          <div class="auth-heading">
+            <h3>Masuk ke Portal FM Audio</h3>
+            <p>Gunakan <strong>Email</strong> atau <strong>Username</strong> beserta password akun Anda.</p>
+          </div>
+
+          <form id="loginForm" onsubmit="handleLoginSubmit(event)">
+            <div class="form-group">
+              <label class="form-label" for="loginIdentifier">Email atau Username</label>
+              <div class="input-wrap">
+                <input type="text" id="loginIdentifier" class="form-control has-icon" placeholder="Contoh: admintoko@gmail.com atau username" required autocomplete="username">
+                <i class="ri-user-3-line input-icon"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:7px;">
+                <label class="form-label" for="loginPassword" style="margin-bottom:0;">Password</label>
+                <a href="javascript:void(0)" onclick="switchAuthTab('otp')" style="font-size:0.76rem; color:var(--gold-light); text-decoration:none;">
+                  Lupa password (OTP Email)?
+                </a>
+              </div>
+              <div class="input-wrap">
+                <input type="password" id="loginPassword" class="form-control has-icon has-toggle" placeholder="Masukkan password Anda" required autocomplete="current-password">
+                <i class="ri-lock-2-line input-icon"></i>
+                <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('loginPassword', this)" title="Tampilkan / Sembunyikan Password">
+                  <i class="ri-eye-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="btnLoginSubmit" class="btn btn-gold" style="width:100%; margin-top:6px;">
+              <i class="ri-shield-keyhole-line"></i> Masuk ke Dashboard
+            </button>
+          </form>
+
+          <div class="role-info-box">
+            <div style="margin-bottom:4px;"><i class="ri-information-line" style="color:var(--gold-light);"></i> <strong>Pemisahan Hak Akses Otomatis:</strong></div>
+            <div>• <strong>Admin Toko:</strong> Akses penuh manajemen katalog, stok &amp; verifikasi pembayaran (tanpa fitur pembelian).</div>
+            <div>• <strong>Pembeli (Menu Daftar):</strong> Akses cek produk, status, harga, jumlah stok &amp; laman pembayaran.</div>
+          </div>
+        </div>
+
+        <!-- 2. FORM DAFTAR AKUN BARU (PEMBELI) -->
+        <div class="auth-form-section" id="sectionRegister">
+          <div class="auth-heading">
+            <h3>Daftar Akun Pembeli Baru</h3>
+            <p>Buat akun untuk mengecek ketersediaan unit, harga resmi, stok &amp; melakukan pembayaran.</p>
+          </div>
+
+          <form id="registerForm" onsubmit="handleRegisterSubmit(event)">
+            <div class="form-group">
+              <label class="form-label" for="regFullName">Nama Lengkap</label>
+              <div class="input-wrap">
+                <input type="text" id="regFullName" class="form-control has-icon" placeholder="Masukkan nama lengkap Anda" required>
+                <i class="ri-profile-line input-icon"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regUsername">Username</label>
+              <div class="input-wrap">
+                <input type="text" id="regUsername" class="form-control has-icon" placeholder="Contoh: budi_audio" required>
+                <i class="ri-at-line input-icon"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regEmail">Alamat Email</label>
+              <div class="input-wrap">
+                <input type="email" id="regEmail" class="form-control has-icon" placeholder="nama@email.com" required>
+                <i class="ri-mail-line input-icon"></i>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="regPassword">Password</label>
+              <div class="input-wrap">
+                <input type="password" id="regPassword" class="form-control has-icon has-toggle" placeholder="Minimal 6 karakter" required minlength="6">
+                <i class="ri-lock-password-line input-icon"></i>
+                <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('regPassword', this)" title="Tampilkan / Sembunyikan Password">
+                  <i class="ri-eye-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="btnRegisterSubmit" class="btn btn-gold" style="width:100%; margin-top:6px;">
+              <i class="ri-user-follow-line"></i> Daftar sebagai Pembeli
+            </button>
+          </form>
+        </div>
+
+        <!-- 3. FORM LUPA PASSWORD DENGAN KODE OTP MELALUI EMAIL -->
+        <div class="auth-form-section" id="sectionOtp">
+          <div class="auth-heading">
+            <h3>Pemulihan Password via OTP Email</h3>
+            <p>Kami akan mengirimkan <strong>6 digit kode OTP</strong> ke alamat email terdaftar Anda.</p>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="otpEmail">Email Terdaftar</label>
+            <div style="display:flex; gap:8px;">
+              <div class="input-wrap" style="flex:1;">
+                <input type="email" id="otpEmail" class="form-control has-icon" placeholder="Masukkan email akun Anda">
+                <i class="ri-mail-send-line input-icon"></i>
+              </div>
+              <button type="button" id="btnSendOtp" class="btn btn-navy" onclick="handleSendOtp()">
+                Kirim OTP
+              </button>
+            </div>
+          </div>
+
+          <form id="otpResetForm" onsubmit="handleVerifyOtpReset(event)">
+            <div class="form-group">
+              <label class="form-label">Masukkan 6 Digit Kode OTP Email</label>
+              <div class="otp-grid" id="otpDigitsContainer">
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]*" required>
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]*" required>
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]*" required>
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]*" required>
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]*" required>
+                <input type="text" maxlength="1" class="otp-digit" inputmode="numeric" pattern="[0-9]*" required>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label" for="otpNewPassword">Password Baru</label>
+              <div class="input-wrap">
+                <input type="password" id="otpNewPassword" class="form-control has-icon has-toggle" placeholder="Minimal 6 karakter" required minlength="6">
+                <i class="ri-key-2-line input-icon"></i>
+                <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('otpNewPassword', this)" title="Tampilkan / Sembunyikan Password">
+                  <i class="ri-eye-line"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="btnVerifyOtpSubmit" class="btn btn-gold" style="width:100%;">
+              <i class="ri-checkbox-circle-line"></i> Verifikasi OTP &amp; Ubah Password
+            </button>
+          </form>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script>
+    // Jika sudah memiliki sesi aktif, langsung arahkan ke dashboard
+    document.addEventListener('DOMContentLoaded', async () => {
+      const { data: { session } } = await window.sb.auth.getSession();
+      if (session && session.user) {
+        window.location.href = 'dashboard.html';
+      }
+      initOtpDigitInputs();
+    });
+
+    function switchAuthTab(tab) {
+      ['login', 'register', 'otp'].forEach(t => {
+        document.getElementById('tabBtn' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+        document.getElementById('section' + t.charAt(0).toUpperCase() + t.slice(1)).classList.toggle('active', t === tab);
+      });
+    }
+
+    async function handleLoginSubmit(e) {
+      e.preventDefault();
+      const identifier = document.getElementById('loginIdentifier').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('btnLoginSubmit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ri-loader-4-line"></i> Memverifikasi Akun...';
+
+      try {
+        const res = await window.FMAuth.login(identifier, password);
+        window.showToast(`Selamat datang, ${res.profile.full_name} (${res.profile.role.toUpperCase()})!`, 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 650);
+      } catch (err) {
+        window.showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ri-shield-keyhole-line"></i> Masuk ke Dashboard';
+      }
+    }
+
+    async function handleRegisterSubmit(e) {
+      e.preventDefault();
+      const fullName = document.getElementById('regFullName').value;
+      const username = document.getElementById('regUsername').value;
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      const btn = document.getElementById('btnRegisterSubmit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ri-loader-4-line"></i> Mendaftarkan Akun...';
+
+      try {
+        const res = await window.FMAuth.register({ fullName, username, email, password });
+        if (res.session) {
+          window.showToast('Pendaftaran Pembeli berhasil! Mengalihkan ke dashboard...', 'success');
+          setTimeout(() => {
+            window.location.href = 'dashboard.html';
+          }, 750);
+        } else {
+          window.showToast('Akun Pembeli berhasil dibuat! Silakan cek email verifikasi (jika aktif) lalu Masuk.', 'success');
+          switchAuthTab('login');
+          document.getElementById('loginIdentifier').value = email;
+        }
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ri-user-follow-line"></i> Daftar sebagai Pembeli';
+      }
+    }
+
+    async function handleSendOtp() {
+      const email = document.getElementById('otpEmail').value;
+      const btn = document.getElementById('btnSendOtp');
+      btn.disabled = true;
+      btn.textContent = 'Mengirim...';
+
+      try {
+        await window.FMAuth.sendPasswordResetOtp(email);
+        window.showToast('Kode OTP 6 digit telah dikirim ke email Anda! Periksa kotak masuk / spam.', 'success');
+      } catch (err) {
+        window.showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Kirim OTP';
+      }
+    }
+
+    async function handleVerifyOtpReset(e) {
+      e.preventDefault();
+      const email = document.getElementById('otpEmail').value;
+      const digits = Array.from(document.querySelectorAll('.otp-digit')).map(i => i.value.trim()).join('');
+      const newPassword = document.getElementById('otpNewPassword').value;
+      const btn = document.getElementById('btnVerifyOtpSubmit');
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="ri-loader-4-line"></i> Memverifikasi OTP...';
+
+      try {
+        await window.FMAuth.verifyOtpAndResetPassword(email, digits, newPassword);
+        window.showToast('Password berhasil diperbarui! Mengalihkan ke dashboard...', 'success');
+        setTimeout(() => {
+          window.location.href = 'dashboard.html';
+        }, 800);
+      } catch (err) {
+        window.showToast(err.message, 'error');
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ri-checkbox-circle-line"></i> Verifikasi OTP &amp; Ubah Password';
+      }
+    }
+
+    // UX Helper: Auto-focus & paste support untuk 6 kotak OTP
+    function initOtpDigitInputs() {
+      const inputs = Array.from(document.querySelectorAll('.otp-digit'));
+      inputs.forEach((input, idx) => {
+        input.addEventListener('input', (e) => {
+          const val = e.target.value.replace(/\D/g, '');
+          e.target.value = val.slice(0, 1);
+          if (val && idx < inputs.length - 1) {
+            inputs[idx + 1].focus();
+          }
+        });
+        input.addEventListener('keydown', (e) => {
+          if (e.key === 'Backspace' && !input.value && idx > 0) {
+            inputs[idx - 1].focus();
+          }
+        });
+        input.addEventListener('paste', (e) => {
+          e.preventDefault();
+          const pasted = (e.clipboardData.getData('text') || '').replace(/\D/g, '').slice(0, 6);
+          pasted.split('').forEach((ch, i) => {
+            if (inputs[i]) inputs[i].value = ch;
+          });
+          if (pasted.length > 0) {
+            inputs[Math.min(pasted.length, inputs.length) - 1].focus();
+          }
+        });
+      });
+    }
+  </script>
+</body>
+</html>

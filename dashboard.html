@@ -1,0 +1,550 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — FM (Fajri Muhammad) Sound System</title>
+  <link rel="icon" type="image/jpeg" href="assets/images/logo-fm.jpg">
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet">
+  <link rel="stylesheet" href="assets/css/style.css">
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <!-- ======================================================================
+         NAVIGASI SIDEBAR KIRI (ELEGAN NAVY-TO-BLACK + LOGO FM)
+         ====================================================================== -->
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-brand">
+        <img src="assets/images/logo-fm.jpg" alt="Logo FM Fajri Muhammad">
+        <div class="sidebar-brand-text">
+          <h2>FM AUDIO</h2>
+          <span>FAJRI MUHAMMAD</span>
+        </div>
+      </div>
+
+      <div class="sidebar-role-strip">
+        <span class="role-led">
+          <span class="led-dot"></span>
+          <span id="sidebarRoleLabel">MEMUAT...</span>
+        </span>
+        <span class="font-mono" style="font-size:0.68rem; color:var(--text-muted);">v2.6</span>
+      </div>
+
+      <nav class="sidebar-nav" id="sidebarNavMenu">
+        <!-- Diisi otomatis sesuai pembatas role (admin vs pembeli) oleh app.js -->
+      </nav>
+
+      <div class="sidebar-footer">
+        <button type="button" class="btn btn-navy" style="width:100%; justify-content:flex-start;" onclick="openProfileModal()">
+          <i class="ri-user-settings-line" style="color:var(--gold-light);"></i> Pengaturan Akun
+        </button>
+        <button type="button" class="btn btn-danger" style="width:100%; justify-content:flex-start; margin-top:8px;" onclick="window.FMAuth.logout()">
+          <i class="ri-logout-box-r-line"></i> Keluar Sistem
+        </button>
+      </div>
+    </aside>
+
+    <!-- ======================================================================
+         MAIN WORKSPACE (TOP HEADER + LINGKARAN PROFILE + KONTEN DINAMIS)
+         ====================================================================== -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="topbar-left">
+          <button type="button" class="mobile-menu-btn" onclick="toggleMobileSidebar()" title="Buka Menu">
+            <i class="ri-menu-2-line"></i>
+          </button>
+          <div class="page-title-block">
+            <h1 id="headerPageTitle">FM Sound System</h1>
+            <p id="headerPageSubtitle">Sistem Informasi Penjualan &amp; Manajemen Inventaris Pro Audio</p>
+          </div>
+        </div>
+
+        <div class="topbar-right">
+          <div class="db-status-chip">
+            <span class="led-dot"></span>
+            <span>Supabase Live</span>
+          </div>
+
+          <!-- LINGKARAN PROFILE (AKSES PENGATURAN FOTO PROFIL & PASSWORD UNTUK SEMUA ROLE) -->
+          <button type="button" class="profile-circle-trigger" onclick="openProfileModal()" title="Klik untuk Pengaturan Profil &amp; Password">
+            <div class="profile-avatar-ring">
+              <img id="topbarAvatarImg" src="assets/images/avatar-default.jpg" alt="Foto Profil Pengguna">
+            </div>
+            <div class="profile-meta">
+              <span class="p-name" id="topbarUserName">Pengguna</span>
+              <span class="p-role" id="topbarUserRole">ROLE</span>
+            </div>
+            <i class="ri-arrow-down-s-line" style="color:var(--gold-light);"></i>
+          </button>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <!-- ==================================================================
+             VIEW 1: DASHBOARD EKSEKUTIF (KHUSUS ROLE ADMIN)
+             ================================================================== -->
+        <section class="view-section" id="view-overview">
+          <div class="amp-hero-banner">
+            <div class="amp-hero-text">
+              <div class="eyebrow"><i class="ri-vip-crown-2-fill"></i> FM (FAJRI MUHAMMAD) EXECUTIVE CONSOLE</div>
+              <h2>Kendali Penjualan &amp; Inventaris Sound System</h2>
+              <p>Kelola katalog amplifier Fender &amp; Marshall, pantau jumlah stok unit, verifikasi pembayaran pembeli, serta awasi performa toko dari satu dasbor terpadu.</p>
+            </div>
+            <div style="display:flex; flex-wrap:wrap; gap:10px;">
+              <button type="button" class="btn btn-gold" onclick="navigateTo('manage-products'); openProductModal();">
+                <i class="ri-add-circle-line"></i> Tambah Unit Baru
+              </button>
+              <button type="button" class="btn btn-navy" onclick="navigateTo('payments')">
+                <i class="ri-secure-payment-line"></i> Cek Pembayaran
+              </button>
+            </div>
+          </div>
+
+          <div class="kpi-grid">
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Pendapatan Terverifikasi</span>
+                <div class="kpi-icon-box"><i class="ri-money-dollar-circle-line"></i></div>
+              </div>
+              <div class="kpi-value" id="kpiTotalRevenue">Rp 0</div>
+              <div class="kpi-sub">Total pembayaran berstatus Lunas</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Transaksi</span>
+                <div class="kpi-icon-box"><i class="ri-file-list-3-line"></i></div>
+              </div>
+              <div class="kpi-value" id="kpiTotalOrders">0 Transaksi</div>
+              <div class="kpi-sub" id="kpiPendingOrders">0 menunggu verifikasi</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Total Stok Sound System</span>
+                <div class="kpi-icon-box"><i class="ri-speaker-line"></i></div>
+              </div>
+              <div class="kpi-value" id="kpiTotalStock">0 Unit</div>
+              <div class="kpi-sub" id="kpiLowStockSub">0 model stok terbatas</div>
+            </div>
+
+            <div class="kpi-card">
+              <div class="kpi-top">
+                <span class="kpi-label">Akun Terdaftar</span>
+                <div class="kpi-icon-box"><i class="ri-team-line"></i></div>
+              </div>
+              <div class="kpi-value" id="kpiTotalUsers">1 Akun</div>
+              <div class="kpi-sub">Admin &amp; Pembeli terautentikasi</div>
+            </div>
+          </div>
+
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3><i class="ri-bar-chart-grouped-line"></i> Ringkasan Ketersediaan Unit Sound System</h3>
+              <button type="button" class="btn btn-outline-gold btn-sm" onclick="navigateTo('manage-products')">
+                Kelola Semua Produk <i class="ri-arrow-right-line"></i>
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Unit Sound System</th>
+                    <th>Merek</th>
+                    <th>Harga Resmi</th>
+                    <th>Jumlah Barang</th>
+                    <th>Status Produk</th>
+                  </tr>
+                </thead>
+                <tbody id="overviewInventoryBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 2: KATALOG PRODUK SOUND SYSTEM (PEMBELI & PRATINJAU ADMIN)
+             ================================================================== -->
+        <section class="view-section" id="view-catalog">
+          <div class="amp-hero-banner" style="padding:22px 28px;">
+            <div class="amp-hero-text">
+              <div class="eyebrow"><i class="ri-sound-module-fill"></i> FENDER &amp; MARSHALL OFFICIAL SHOWROOM</div>
+              <h2>Katalog Amplifier, Mixing Console &amp; PA System</h2>
+              <p>Periksa status ketersediaan unit, harga resmi, spesifikasi teknis, serta jumlah barang tersedia secara transparan.</p>
+            </div>
+          </div>
+
+          <div class="filter-toolbar">
+            <div class="filter-group">
+              <button type="button" class="brand-pill-btn active" onclick="setBrandFilter('ALL', this)">Semua Merek</button>
+              <button type="button" class="brand-pill-btn" onclick="setBrandFilter('Fender', this)">Fender</button>
+              <button type="button" class="brand-pill-btn" onclick="setBrandFilter('Marshall', this)">Marshall</button>
+              <button type="button" class="brand-pill-btn" onclick="setBrandFilter('Behringer', this)">Behringer</button>
+            </div>
+
+            <div class="filter-group">
+              <select class="form-control" style="width:auto; min-width:170px;" onchange="setCategoryFilter(this.value)">
+                <option value="ALL">Semua Kategori</option>
+                <option value="Amplifier">Amplifier</option>
+                <option value="Mixing Console">Mixing Console</option>
+                <option value="PA System">PA System</option>
+              </select>
+
+              <div class="input-wrap" style="min-width:230px;">
+                <input type="text" class="form-control has-icon" placeholder="Cari tipe, SKU, spesifikasi..." oninput="setSearchQuery(this.value)">
+                <i class="ri-search-line input-icon"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-grid" id="catalogProductGrid"></div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 3: KERANJANG & CHECKOUT (KHUSUS ROLE PEMBELI)
+             ================================================================== -->
+        <section class="view-section" id="view-cart">
+          <div class="checkout-grid">
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3><i class="ri-shopping-bag-3-line"></i> Daftar Unit Pilihan Anda</h3>
+                <span class="font-mono" id="cartTotalUnits" style="color:var(--gold-light); font-weight:700;">0 Unit</span>
+              </div>
+              <div id="cartItemsContainer"></div>
+            </div>
+
+            <div class="panel-card">
+              <div class="panel-header">
+                <h3><i class="ri-bank-card-line"></i> Rincian Pembayaran</h3>
+              </div>
+
+              <form onsubmit="submitCheckoutOrder(event)">
+                <div style="padding:14px 16px; border-radius:12px; background:rgba(4,8,19,0.8); border:1px solid var(--brass-border); margin-bottom:18px;">
+                  <div style="font-size:0.75rem; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.08em;">Total Tagihan Pembelian</div>
+                  <div class="font-mono" id="cartGrandTotal" style="font-size:1.65rem; font-weight:700; color:var(--gold-light); margin-top:4px;">Rp 0</div>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="checkoutPaymentMethod">Metode Pembayaran</label>
+                  <select id="checkoutPaymentMethod" class="form-control" required>
+                    <option value="Transfer Bank BCA (8820-4419-01 a.n. FM Sound System)">Transfer Bank BCA — 8820-4419-01</option>
+                    <option value="Transfer Bank Mandiri (1130-0098-7721 a.n. Fajri Muhammad)">Transfer Bank Mandiri — 1130-0098-7721</option>
+                    <option value="Virtual Account BNI (9881-0023-4410)">Virtual Account BNI — 9881-0023-4410</option>
+                    <option value="QRIS Instan FM Pro Audio">QRIS Instan FM Pro Audio</option>
+                  </select>
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="checkoutPaymentRef">Nomor Referensi / Bukti Transfer (Opsional)</label>
+                  <input type="text" id="checkoutPaymentRef" class="form-control" placeholder="Isi jika sudah transfer, atau konfirmasi nanti di Laman Pembayaran">
+                </div>
+
+                <div class="form-group">
+                  <label class="form-label" for="checkoutNotes">Catatan Pengiriman / Alamat Tujuan</label>
+                  <textarea id="checkoutNotes" class="form-control" rows="3" placeholder="Masukkan alamat lengkap pengiriman unit sound system..."></textarea>
+                </div>
+
+                <button type="submit" id="btnSubmitOrder" class="btn btn-gold" style="width:100%;">
+                  <i class="ri-secure-payment-line"></i> Buat Pesanan &amp; Lanjut ke Pembayaran
+                </button>
+              </form>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 4: LAMAN PEMBAYARAN (PEMBELI CEK TAGIHAN & ADMIN VERIFIKASI)
+             ================================================================== -->
+        <section class="view-section" id="view-payments">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3 id="paymentsPanelTitle"><i class="ri-bill-line"></i> Laman Pembayaran &amp; Status Transaksi</h3>
+              <button type="button" class="btn btn-outline-gold btn-sm" onclick="loadOrders().then(renderPaymentsView)">
+                <i class="ri-refresh-line"></i> Segarkan Status
+              </button>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Invoice &amp; Tanggal</th>
+                    <th>Data Pembeli</th>
+                    <th>Unit Dibeli &amp; Metode</th>
+                    <th>Total Harga</th>
+                    <th>Status Pembayaran</th>
+                    <th>Status Barang</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="paymentsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 5: KELOLA PRODUK & STOK (KHUSUS ROLE ADMIN)
+             ================================================================== -->
+        <section class="view-section" id="view-manage-products">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3><i class="ri-equalizer-line"></i> Manajemen Katalog Sound System</h3>
+              <div style="display:flex; flex-wrap:wrap; gap:8px;">
+                <button type="button" class="btn btn-navy btn-sm" onclick="seedInitialProductsToSupabase(false)">
+                  <i class="ri-database-2-line"></i> Sinkronkan 9 Unit Awal
+                </button>
+                <button type="button" class="btn btn-gold btn-sm" onclick="openProductModal()">
+                  <i class="ri-add-line"></i> Tambah Produk Baru
+                </button>
+              </div>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Produk &amp; SKU</th>
+                    <th>Merek</th>
+                    <th>Kategori</th>
+                    <th>Harga</th>
+                    <th>Jumlah Barang</th>
+                    <th>Status Produk</th>
+                    <th>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody id="adminProductsTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================================================================
+             VIEW 6: MANAJEMEN PENGGUNA (KHUSUS ROLE ADMIN)
+             ================================================================== -->
+        <section class="view-section" id="view-users">
+          <div class="panel-card">
+            <div class="panel-header">
+              <h3><i class="ri-group-line"></i> Daftar Akun &amp; Pembatas Role Sistem</h3>
+            </div>
+            <div class="table-responsive">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Pengguna</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Hak Akses Sistem</th>
+                  </tr>
+                </thead>
+                <tbody id="adminUsersTableBody"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 1: PENGATURAN AKUN & FOTO PROFIL (LINGKARAN PROFILE - SEMUA ROLE)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="profileModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="ri-user-settings-line"></i> Pengaturan Akun &amp; Foto Profil</h3>
+        <button type="button" class="modal-close" onclick="closeModal('profileModal')">&times;</button>
+      </div>
+
+      <div class="avatar-upload-preview">
+        <img id="modalAvatarPreview" src="assets/images/avatar-default.jpg" alt="Preview Foto Profil">
+        <div>
+          <span class="status-badge status-terbatas" id="profRoleBadge" style="margin-bottom:8px;">ROLE</span>
+          <div>
+            <label for="avatarFileInput" class="btn btn-outline-gold btn-sm" style="cursor:pointer;">
+              <i class="ri-camera-lens-line"></i> Ganti Foto Profil
+            </label>
+            <input type="file" id="avatarFileInput" accept="image/jpeg,image/png,image/webp" style="display:none;" onchange="handleAvatarFileChange(event)">
+          </div>
+          <p style="font-size:0.72rem; color:var(--text-muted); margin-top:6px;">Format JPG/PNG • Otomatis disesuaikan presisi lingkaran</p>
+        </div>
+      </div>
+
+      <form onsubmit="saveProfileChanges(event)">
+        <div class="form-group">
+          <label class="form-label" for="profFullName">Nama Lengkap</label>
+          <input type="text" id="profFullName" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profUsername">Username</label>
+          <input type="text" id="profUsername" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profEmail">Email Akun (Terautentikasi)</label>
+          <input type="email" id="profEmail" class="form-control" disabled style="opacity:0.65;">
+        </div>
+
+        <button type="submit" id="btnSaveProfile" class="btn btn-gold" style="width:100%;">
+          <i class="ri-save-3-line"></i> Simpan Perubahan Profil
+        </button>
+      </form>
+
+      <hr style="border:none; border-top:1px solid rgba(148,163,184,0.14); margin:22px 0;">
+
+      <form onsubmit="saveNewAccountPassword(event)">
+        <h4 style="font-size:0.92rem; color:var(--gold-light); margin-bottom:12px;">
+          <i class="ri-lock-password-line"></i> Perbarui Password Akun
+        </h4>
+
+        <div class="form-group">
+          <label class="form-label" for="profNewPassword">Password Baru</label>
+          <div class="input-wrap">
+            <input type="password" id="profNewPassword" class="form-control has-toggle" placeholder="Minimal 6 karakter" minlength="6" required>
+            <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('profNewPassword', this)">
+              <i class="ri-eye-line"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="profConfirmPassword">Konfirmasi Password Baru</label>
+          <div class="input-wrap">
+            <input type="password" id="profConfirmPassword" class="form-control has-toggle" placeholder="Ulangi password baru" minlength="6" required>
+            <button type="button" class="toggle-pass-btn" onclick="togglePasswordVisibility('profConfirmPassword', this)">
+              <i class="ri-eye-line"></i>
+            </button>
+          </div>
+        </div>
+
+        <button type="submit" id="btnSavePassword" class="btn btn-navy" style="width:100%;">
+          <i class="ri-lock-password-line"></i> Perbarui Password
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 2: TAMBAH / EDIT PRODUK SOUND SYSTEM (ADMIN ONLY)
+       ======================================================================== -->
+  <div class="modal-backdrop" id="productModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3 id="productModalTitle">Tambah Produk Sound System</h3>
+        <button type="button" class="modal-close" onclick="closeModal('productModal')">&times;</button>
+      </div>
+
+      <form id="productForm" onsubmit="saveProductForm(event)">
+        <input type="hidden" id="prodEditId">
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label" for="prodSku">Kode SKU</label>
+            <input type="text" id="prodSku" class="form-control font-mono" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodBrand">Merek</label>
+            <select id="prodBrand" class="form-control" required>
+              <option value="Fender">Fender</option>
+              <option value="Marshall">Marshall</option>
+              <option value="Behringer">Behringer</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prodName">Nama Model Sound System</label>
+          <input type="text" id="prodName" class="form-control" placeholder="Contoh: Marshall JCM800 100W Head" required>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label" for="prodCategory">Kategori</label>
+            <select id="prodCategory" class="form-control" required>
+              <option value="Amplifier">Amplifier</option>
+              <option value="Mixing Console">Mixing Console</option>
+              <option value="PA System">PA System</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodStatus">Status Produk</label>
+            <select id="prodStatus" class="form-control" required>
+              <option value="Tersedia">Tersedia</option>
+              <option value="Stok Terbatas">Stok Terbatas</option>
+              <option value="Habis">Habis</option>
+            </select>
+          </div>
+        </div>
+
+        <div style="display:grid; grid-template-columns:1.3fr 0.7fr; gap:12px;">
+          <div class="form-group">
+            <label class="form-label" for="prodPrice">Harga Resmi (Rp)</label>
+            <input type="number" id="prodPrice" class="form-control font-mono" min="0" step="50000" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="prodStock">Jumlah Barang</label>
+            <input type="number" id="prodStock" class="form-control font-mono" min="0" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prodImageSelect">Pilih Foto Unit (.JPG)</label>
+          <select id="prodImageSelect" class="form-control" required></select>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="prodSpecs">Spesifikasi Teknis</label>
+          <textarea id="prodSpecs" class="form-control" rows="2" placeholder="Wattage, speaker driver, channel input..."></textarea>
+        </div>
+
+        <button type="submit" class="btn btn-gold" style="width:100%;">
+          <i class="ri-save-line"></i> Simpan Produk ke Database
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 3: KONFIRMASI PEMBAYARAN PEMBELI
+       ======================================================================== -->
+  <div class="modal-backdrop" id="buyerPayModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="ri-upload-2-line"></i> Konfirmasi Bukti Pembayaran</h3>
+        <button type="button" class="modal-close" onclick="closeModal('buyerPayModal')">&times;</button>
+      </div>
+      <form onsubmit="submitBuyerPaymentProof(event)">
+        <input type="hidden" id="confirmOrderId">
+        <div style="padding:12px 14px; background:rgba(4,8,19,0.75); border-radius:10px; border:1px solid var(--brass-border); margin-bottom:16px;">
+          <div style="font-size:0.72rem; color:var(--text-muted);">TAGIHAN INVOICE</div>
+          <div class="font-mono" id="confirmInvoiceLabel" style="font-weight:700; color:var(--gold-light); margin-top:2px;">-</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="confirmRefInput">Nomor Referensi Transfer / Kode Transaksi Bank</label>
+          <input type="text" id="confirmRefInput" class="form-control" placeholder="Contoh: TRF-BCA-9928310 a.n. Nama Pengirim" required>
+        </div>
+        <button type="submit" class="btn btn-gold" style="width:100%;">
+          <i class="ri-check-line"></i> Kirim Konfirmasi ke Admin
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================================
+       MODAL 4: RINCIAN INVOICE
+       ======================================================================== -->
+  <div class="modal-backdrop" id="invoiceModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h3><i class="ri-file-list-3-line"></i> Rincian Invoice &amp; Pembayaran</h3>
+        <button type="button" class="modal-close" onclick="closeModal('invoiceModal')">&times;</button>
+      </div>
+      <div id="invoiceModalBody"></div>
+    </div>
+  </div>
+
+  <script src="assets/js/supabase-config.js"></script>
+  <script src="assets/js/auth.js"></script>
+  <script src="assets/js/app.js"></script>
+</body>
+</html>
